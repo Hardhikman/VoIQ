@@ -91,7 +91,6 @@ VoIQ/
 │       ├── fuzzy.rs    # Levenshtein matching
 │       ├── questions.rs # MCQ generation
 │       └── progress.rs # Attempt tracking
-└── docs/               # Documentation
 ```
 
 ## 🛠️ Tech Stack
@@ -104,13 +103,6 @@ VoIQ/
 | **Database** | SQLite |
 | **Fuzzy Match** | Levenshtein (strsim) |
 
-## 📚 Documentation
-
-- [Architecture](docs/architecture.md) - System design
-- [Setup Guide](docs/setup.md) - Installation
-- [Agents](docs/agents.md) - Multi-agent system
-- [API Reference](docs/api.md) - Rust functions
-- [Usage Guide](docs/usage.md) - Commands & tips
 
 ## 📄 License
 
