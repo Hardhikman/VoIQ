@@ -70,6 +70,21 @@ CUSTOM_CSS = """
 .quick-btn:hover {
     transform: scale(1.02);
 }
+
+.timer-pulse {
+    animation: pulse-red 1s infinite alternate;
+}
+
+@keyframes pulse-red {
+    from {
+        box-shadow: 0 0 5px #ef4444;
+        transform: scale(1);
+    }
+    to {
+        box-shadow: 0 0 20px #ef4444;
+        transform: scale(1.1);
+    }
+}
 """
 
 
@@ -167,11 +182,32 @@ with gr.Blocks(
                             container=False,
                         )
                         send_btn = gr.Button("Send", variant="primary", scale=1)
+                    
+                    # Visual Timer Component
+                    timer_html = gr.HTML(
+                        """
+                        <div id="voiq-timer-container" style="display: none; justify-content: center; margin-top: 10px;">
+                            <div id="voiq-timer-circle" style="
+                                width: 60px; 
+                                height: 60px; 
+                                border-radius: 50%; 
+                                border: 4px solid #6366f1; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                font-weight: bold; 
+                                font-size: 1.2rem;
+                                transition: all 0.3s ease;
+                            ">--</div>
+                        </div>
+                        """,
+                        elem_id="voiq-timer-html"
+                    )
                 
                 with gr.Column(scale=1):
                     gr.Markdown("### ⚡ Quick Actions")
                     
-                    start_btn = gr.Button("� Start Quiz", elem_classes="quick-btn", variant="primary")
+                    start_btn = gr.Button(" Start Quiz", elem_classes="quick-btn", variant="primary")
                     categories_btn = gr.Button("📂 Categories", elem_classes="quick-btn")
                     add_word_btn = gr.Button("➕ Add Word", elem_classes="quick-btn")
                     review = gr.Button("📝 Review Failed", elem_classes="quick-btn")
@@ -180,7 +216,72 @@ with gr.Blocks(
                     gr.Markdown("---")
                     gr.Markdown("*Type `start` for guided quiz setup*")
             
-            # Event handlers
+            # JavaScript for Timer Logic
+            app.load(None, None, None, js="""
+            () => {
+                let timerInterval = null;
+                let lastResponse = "";
+
+                const observer = new MutationObserver((mutations) => {
+                    const chatbot = document.querySelector("#quiz .chatbot");
+                    if (!chatbot) return;
+
+                    const messages = chatbot.querySelectorAll(".message");
+                    if (messages.length === 0) return;
+
+                    const lastMsg = messages[messages.length - 1].innerText;
+                    if (lastMsg === lastResponse) return;
+                    lastResponse = lastMsg;
+
+                    const timerContainer = document.getElementById("voiq-timer-container");
+                    const timerCircle = document.getElementById("voiq-timer-circle");
+                    if (!timerContainer || !timerCircle) return;
+
+                    // Stop existing timer
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+
+                    // Look for timer emoji and seconds
+                    const match = lastMsg.match(/⏱️.*?(\d+)\s*seconds/i);
+                    if (match) {
+                        let seconds = parseInt(match[1]);
+                        timerContainer.style.display = "flex";
+                        timerCircle.innerText = seconds;
+                        timerCircle.style.borderColor = "#6366f1";
+                        timerCircle.style.color = "#f1f5f9";
+                        timerCircle.classList.remove("timer-pulse");
+
+                        timerInterval = setInterval(() => {
+                            seconds--;
+                            if (seconds <= 0) {
+                                timerCircle.innerText = "0";
+                                timerCircle.style.borderColor = "#ef4444";
+                                timerCircle.style.color = "#ef4444";
+                                timerCircle.classList.add("timer-pulse");
+                                clearInterval(timerInterval);
+                                timerInterval = null;
+                            } else {
+                                timerCircle.innerText = seconds;
+                                if (seconds <= 3) {
+                                    timerCircle.style.borderColor = "#ef4444";
+                                    timerCircle.style.color = "#ef4444";
+                                }
+                            }
+                        }, 1000);
+                    } else {
+                        // Hide timer if no timer emoji found (feedback message)
+                        timerContainer.style.display = "none";
+                    }
+                });
+
+                const chatbotContainer = document.querySelector("#quiz");
+                if (chatbotContainer) {
+                    observer.observe(chatbotContainer, { childList: true, subtree: true });
+                }
+            }
+            """)
             msg_input.submit(chat_response, [msg_input, chatbot], [msg_input, chatbot])
             send_btn.click(chat_response, [msg_input, chatbot], [msg_input, chatbot])
             
