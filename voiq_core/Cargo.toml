@@ -1,0 +1,21 @@
+[package]
+name = "voiq_core"
+version = "0.1.0"
+edition = "2021"
+description = "VoIQ Vocabulary Quiz - High-performance Rust core"
+
+[lib]
+name = "voiq_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+calamine = "0.26"
+csv = "1.3"
+strsim = "0.11"
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = "0.4"
+

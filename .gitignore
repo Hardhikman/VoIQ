@@ -1,0 +1,51 @@
+# VoIQ - Vocabulary Intelligence Quiz System
+
+# Dependencies
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Database
+data/*.db
+*.sqlite
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs & Temp
+logs/
+*.log
+update.txt
+plan.md
+
+# Rust build artifacts
+voiq_core/target/
+voiq_core/Cargo.lock (if you want to exclude it, usually included in bin projects)
+*.so
+*.dll
+*.dylib
+
+# Python testing/build
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+docs/
+update.txt
+plan.md
